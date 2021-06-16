@@ -1,0 +1,57 @@
+# Digital Signage Automation
+# Will Farland
+# 6/16/2021
+
+# Program takes a video file located on the Special Drive and uses VLC media player to display the video using the NDI protocol
+# Video to display is currently located in Special/Infotech/Will/DigitalSignage
+# Program requires VLC media player and the NDI toolkit to be installed in order 1) NDI Toolkit 2) VLC Media player
+
+.\vlc "F:\display.mp4"  --input-repeat=5000 --play-and-exit # iniital startup
+$p = Get-Process vlc -ErrorAction SilentlyContinue # get PID
+
+function Display
+{
+        .\vlc "F:\display.mp4"  --input-repeat=5000 --play-and-exit
+        $p = Get-Process vlc -ErrorAction SilentlyContinue # get PID
+      #  Wait-Process -Id $p.id
+      #  Write-Host "Video Terminated"
+}
+
+function StopDisplay
+{
+    Stop-Process -Id $p.id
+}
+
+# *** Start of Main Code ***
+
+# Change Directory to VLC
+"C:\Program Files (x86)\VideoLAN\VLC.exe" 
+
+
+New-PSDrive -Name "F" -PSProvider FileSystem -Root "\\isom-filesrv-1.campus.ads.umass.edu\common\Special\InfoTech\Will\DigitalSignage" -Persist
+$monitoredFile = "F:\display.mp4"
+open="C:\ProgramData\Microsoft\Windows\Start Menu\Programs\VideoLAN\VLC media player.lnk" --fullscreen "F:\display.mp4"
+$lastModified = (Get-ItemProperty -Path $monitoredFile -Name LastWriteTime).LastWriteTime
+
+
+
+while ($true)
+{
+    if ((Get-ItemProperty -Path $monitoredFile -Name LastWriteTime).LastWriteTime -ne $lastModified)
+    {
+        write-host "File has been modified"
+        $lastModified = (Get-ItemProperty -Path $monitoredFile -Name LastWriteTime).LastWriteTime
+        StopDisplay
+
+    }
+    else
+    {
+       if((get-process "vlc" -ea SilentlyContinue) -eq $Null){ 
+            Display
+        }
+    }
+
+    start-sleep -seconds 5
+}
+
+
