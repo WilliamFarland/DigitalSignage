@@ -6,6 +6,9 @@
 # Video to display is currently located in Special/Infotech/Will/DigitalSignage
 # Program requires VLC media player and the NDI toolkit to be installed in order 1) NDI Toolkit 2) VLC Media player
 
+# Change Directory to VLC
+cd "C:\Program Files (x86)\VideoLAN\VLC.exe" 
+
 .\vlc "F:\display.mp4"  --input-repeat=5000 --play-and-exit # iniital startup
 $p = Get-Process vlc -ErrorAction SilentlyContinue # get PID
 
@@ -24,8 +27,6 @@ function StopDisplay
 
 # *** Start of Main Code ***
 
-# Change Directory to VLC
-"C:\Program Files (x86)\VideoLAN\VLC.exe" 
 
 
 New-PSDrive -Name "F" -PSProvider FileSystem -Root "\\isom-filesrv-1.campus.ads.umass.edu\common\Special\InfoTech\Will\DigitalSignage" -Persist
@@ -53,5 +54,3 @@ while ($true)
 
     start-sleep -seconds 5
 }
-
-
